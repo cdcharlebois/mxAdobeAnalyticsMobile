@@ -1,15 +1,93 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<widget id="AdobeAnalytics.widget.AdobeAnalytics" needsEntityContext="false" xmlns="http://www.mendix.com/widget/1.0/">
+<widget id="AdobeAnalytics.widget.AdobeAnalytics" needsEntityContext="true" mobile="true" offlineCapable="true"
+    xmlns="http://www.mendix.com/widget/1.0/">
     <name>AdobeAnalytics</name>
     <description>The description of this widget.</description>
-
     <icon />
-
     <properties>
-        <property key="dummyKey" type="string" required="false" defaultValue="">
-            <caption>Dummy key</caption>
-            <category>Appearance</category>
-            <description>This key was added to make the widget work in the Modeler (needs atleast 1 key). Please change/remove this one</description>
+        <property key="dataset" type="object" required="false" isList="true">
+            <caption>Data Set</caption>
+            <category>Data</category>
+            <description>Data points that you will reference in your event payload</description>
+            <properties>
+                <property key="dataName" type="string" required="false" defaultValue="">
+                    <caption>Name</caption>
+                    <category>General</category>
+                    <description>{name}</description>
+                </property>
+                <property key="dataAttribute" type="attribute" required="true" isPath="optional" pathType="reference">
+                    <caption>Value</caption>
+                    <category>General</category>
+                    <description>The value at this attribute will replace {name} in the payload</description>
+                    <attributeTypes>
+                        <attributeType name="AutoNumber"/>
+                        <attributeType name="Boolean"/>
+                        <attributeType name="DateTime"/>
+                        <attributeType name="Decimal"/>
+                        <attributeType name="Enum"/>
+                        <attributeType name="Integer"/>
+                        <attributeType name="Long"/>
+                        <attributeType name="String"/>
+                    </attributeTypes>
+                </property>
+            </properties>
+        </property>
+        <property key="events" type="object" required="false" isList="true">
+            <caption>Events</caption>
+            <category>General</category>
+            <description>Define your events</description>
+            <properties>
+                <property key="type" type="enumeration" defaultValue="PageLoad">
+                    <caption>Type</caption>
+                    <category>Event</category>
+                    <description></description>
+                    <enumerationValues>
+                        <enumerationValue key="PageLoad">Page Load</enumerationValue>
+                        <enumerationValue key="Click">Click</enumerationValue>
+                    </enumerationValues>
+                </property>
+                <property key="target" type="string" required="false" defaultValue="">
+                    <caption>Target</caption>
+                    <category>Event</category>
+                    <description>(required if Type is "Click"). The mendix name of the element to trigger the event, i.e. 'actionButton1'</description>
+                </property>
+                <property key="name" type="string" required="false" defaultValue="">
+                    <caption>Event Name</caption>
+                    <category>Event</category>
+                    <description></description>
+                </property>
+                <property key="key_VisitorId" type="string" required="false" defaultValue="">
+                    <caption>Visitor ID</caption>
+                    <category>Payload</category>
+                    <description></description>
+                </property>
+                <property key="key_SessionId" type="string" required="false" defaultValue="">
+                    <caption>Session ID</caption>
+                    <category>Payload</category>
+                    <description></description>
+                </property>
+                <property key="key_Action" type="string" required="false" defaultValue="">
+                    <caption>Action</caption>
+                    <category>Payload</category>
+                    <description></description>
+                </property>
+                <property key="key_Country" type="string" required="false" defaultValue="">
+                    <caption>Country</caption>
+                    <category>Payload</category>
+                    <description></description>
+                </property>
+                <property key="key_Currency" type="string" required="false" defaultValue="">
+                    <caption>Currency</caption>
+                    <category>Payload</category>
+                    <description></description>
+                </property>
+                <property key="key_Value" type="string" required="false" defaultValue="">
+                    <caption>Value</caption>
+                    <category>Payload</category>
+                    <description></description>
+                </property>
+                <!-- <property key="payload" type="object" required="false" isList="true"><caption>Event Payload</caption><category>Payload</category><description></description><properties><property key="keyName" type="string" required="true" defaultValue=""><caption>Key Name</caption><category>General</category><description></description></property><property key="keyValue" type="string" required="true" defaultValue=""><caption>Key Value</caption><category>General</category><description></description></property></properties></property> -->
+            </properties>
         </property>
     </properties>
 </widget>
