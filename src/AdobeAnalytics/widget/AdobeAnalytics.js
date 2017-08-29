@@ -99,14 +99,6 @@ define([
                         el.addEventListener('touchstart', lang.hitch(this, function(e) {
                             this._fireEvent(e.target.dataset.name, JSON.parse(e.target.dataset.payload))
                         }));
-                        // this.connect(el, "onclick", ADB.trackState(name, payload,
-                        //     function(success) {
-                        //         console.log('success')
-                        //     },
-                        //     function(fail) {
-                        //         console.log(fail)
-                        //     }
-                        // ));
                     }
 
                 }))
@@ -132,29 +124,14 @@ define([
                         e_type: event.type,
                         e_target: event.target,
                         e_name: event.name,
-                        VisitorID: event.key_VisitorId,
-                        SessionID: event.key_SessionId,
+                        VisitorID: mx.session.getUserName(),
+                        SessionID: mx.session.getSessionObjectId(),
                         action: event.key_Action,
                         country: event.key_Country,
                         currency: event.key_Currency,
                         value: event.key_Value
                     }
                 })))
-            }))
-        },
-        _preparePayload: function() {
-            return new Promise(lang.hitch(this, function(resolve) {
-                resolve({
-                    e_type: event.type,
-                    e_target: event.target,
-                    e_name: event.name,
-                    VisitorID: this.key_VisitorId,
-                    SessionID: this.key_SessionId,
-                    action: this.key_Action,
-                    country: this.key_Country,
-                    currency: this.key_Currency,
-                    value: this.key_Value
-                })
             }))
         },
         _replaceTokens: function(payloadObj) {
@@ -192,8 +169,8 @@ define([
                                 e_type: obj.e_type,
                                 e_target: obj.e_target,
                                 e_name: obj.e_name,
-                                VisitorID: this._applyReplacements(obj.VisitorID, toReplace),
-                                SessionID: this._applyReplacements(obj.SessionID, toReplace),
+                                VisitorID: obj.VisitorID,
+                                SessionID: obj.SessionID,
                                 action: this._applyReplacements(obj.action, toReplace),
                                 country: this._applyReplacements(obj.country, toReplace),
                                 currency: this._applyReplacements(obj.currency, toReplace),
@@ -203,8 +180,8 @@ define([
                             e_type: payloadObj.e_type,
                             e_target: payloadObj.e_target,
                             e_name: payloadObj.e_name,
-                            VisitorID: this._applyReplacements(payloadObj.VisitorID, toReplace),
-                            SessionID: this._applyReplacements(payloadObj.SessionID, toReplace),
+                            VisitorID: payloadObj.VisitorID,
+                            SessionID: payloadObj.SessionID,
                             action: this._applyReplacements(payloadObj.action, toReplace),
                             country: this._applyReplacements(payloadObj.country, toReplace),
                             currency: this._applyReplacements(payloadObj.currency, toReplace),
