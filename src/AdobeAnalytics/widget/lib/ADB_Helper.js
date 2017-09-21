@@ -93,6 +93,10 @@
             return cordova.exec(success, fail, "ADBMobile_PhoneGap", "trackState", [stateName, cData]);
         };
 
+        ADB.trackPage = function(pageName, cData, success, fail) {
+            return cordova.exec(success, fail, "ADBMobile_PhoneGap", "trackPage", [pageName]);
+        };
+
         ADB.trackAction = function(action, cData, success, fail) {
             return cordova.exec(success, fail, "ADBMobile_PhoneGap", "trackAction", [action, cData]);
         };

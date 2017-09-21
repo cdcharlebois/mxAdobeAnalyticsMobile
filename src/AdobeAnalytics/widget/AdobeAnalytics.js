@@ -14,7 +14,7 @@ define([
     "dojo/text",
     "dojo/html",
     "dojo/_base/event",
-    "widgets/AdobeAnalytics/widget/lib/ADB_Helper"
+    "AdobeAnalytics/widget/lib/ADB_Helper"
 
 
 ], function(declare, _WidgetBase, dom, dojoDom, dojoProp, dojoGeometry, dojoClass, dojoStyle, dojoConstruct, dojoArray, lang, dojoText, dojoHtml, dojoEvent, ADB) {
@@ -168,7 +168,7 @@ define([
                             return {
                                 e_type: obj.e_type,
                                 e_target: obj.e_target,
-                                e_name: obj.e_name,
+                                e_name: this._applyReplacements(obj.e_name, toReplace).split(' ').join(''),
                                 VisitorID: obj.VisitorID,
                                 SessionID: obj.SessionID,
                                 action: this._applyReplacements(obj.action, toReplace),
@@ -179,7 +179,7 @@ define([
                         })) : {
                             e_type: payloadObj.e_type,
                             e_target: payloadObj.e_target,
-                            e_name: payloadObj.e_name,
+                            e_name: this._applyReplacements(payloadObj.e_name, toReplace).split(' ').join(''),
                             VisitorID: payloadObj.VisitorID,
                             SessionID: payloadObj.SessionID,
                             action: this._applyReplacements(payloadObj.action, toReplace),
