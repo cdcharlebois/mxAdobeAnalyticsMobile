@@ -168,7 +168,7 @@ define([
                             return {
                                 e_type: obj.e_type,
                                 e_target: obj.e_target,
-                                e_name: this._applyReplacements(obj.e_name, toReplace).split(' ').join(''),
+                                e_name: this._applyReplacements(obj.e_name, toReplace).split(' ').join('_').toLowerCase(),
                                 VisitorID: obj.VisitorID,
                                 SessionID: obj.SessionID,
                                 action: this._applyReplacements(obj.action, toReplace),
@@ -179,7 +179,7 @@ define([
                         })) : {
                             e_type: payloadObj.e_type,
                             e_target: payloadObj.e_target,
-                            e_name: this._applyReplacements(payloadObj.e_name, toReplace).split(' ').join(''),
+                            e_name: this._applyReplacements(payloadObj.e_name, toReplace).split(' ').join('_').toLowerCase(),
                             VisitorID: payloadObj.VisitorID,
                             SessionID: payloadObj.SessionID,
                             action: this._applyReplacements(payloadObj.action, toReplace),
