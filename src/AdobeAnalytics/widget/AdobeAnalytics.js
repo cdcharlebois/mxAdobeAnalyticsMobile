@@ -55,9 +55,9 @@ define([
             logger.debug(this.id + ".update");
             if (obj != null && !this._executed) {
                 this._contextObj = obj;
-                this._preparePayloads()
-                    .then(lang.hitch(this, this._replaceTokens))
-                    .then(lang.hitch(this, this._attachListeners))
+                this._preparePayloads() // DONE
+                    .then(lang.hitch(this, this._replaceTokens)) // DONE
+                    .then(lang.hitch(this, this._attachListeners)) // DONE
             }
             this._updateRendering(callback);
         },
@@ -80,7 +80,10 @@ define([
                             action: event.action,
                             country: event.country,
                             currency: event.currency,
-                            value: event.value
+                            value: event.value,
+                            appname: event.appname,
+                            language: event.language,
+                            sector: event.sector
                         }
                     if (event.e_type === "PageLoad") {
                         //fire event
@@ -129,10 +132,30 @@ define([
                         action: event.key_Action,
                         country: event.key_Country,
                         currency: event.key_Currency,
-                        value: event.key_Value
+                        value: event.key_Value,
+                        appname: event.key_Appname,
+                        language: event.key_Language,
+                        sector: event.key_Sector
                     }
                 })))
             }))
+        },
+
+        _buildPayloadForEvent: function(payloadObj, toReplace) {
+            return {
+                e_type: payloadObj.e_type,
+                e_target: payloadObj.e_target,
+                e_name: this._applyReplacements(payloadObj.e_name, toReplace).toLowerCase(),
+                VisitorID: payloadObj.VisitorID,
+                SessionID: payloadObj.SessionID,
+                action: this._applyReplacements(payloadObj.action, toReplace),
+                country: this._applyReplacements(payloadObj.country, toReplace),
+                currency: this._applyReplacements(payloadObj.currency, toReplace),
+                value: this._applyReplacements(payloadObj.value, toReplace),
+                appname: this._applyReplacements(payloadObj.appname, toReplace),
+                language: this._applyReplacements(payloadObj.language, toReplace),
+                sector: this._applyReplacements(payloadObj.sector, toReplace)
+            }
         },
         _replaceTokens: function(payloadObj) {
             var toReplace = [],
@@ -165,28 +188,10 @@ define([
                     resolve(
                         payloadObj.constructor === Array ?
                         payloadObj.map(lang.hitch(this, function(obj) {
-                            return {
-                                e_type: obj.e_type,
-                                e_target: obj.e_target,
-                                e_name: this._applyReplacements(obj.e_name, toReplace).split(' ').join('_').toLowerCase(),
-                                VisitorID: obj.VisitorID,
-                                SessionID: obj.SessionID,
-                                action: this._applyReplacements(obj.action, toReplace),
-                                country: this._applyReplacements(obj.country, toReplace),
-                                currency: this._applyReplacements(obj.currency, toReplace),
-                                value: this._applyReplacements(obj.value, toReplace)
-                            }
-                        })) : {
-                            e_type: payloadObj.e_type,
-                            e_target: payloadObj.e_target,
-                            e_name: this._applyReplacements(payloadObj.e_name, toReplace).split(' ').join('_').toLowerCase(),
-                            VisitorID: payloadObj.VisitorID,
-                            SessionID: payloadObj.SessionID,
-                            action: this._applyReplacements(payloadObj.action, toReplace),
-                            country: this._applyReplacements(payloadObj.country, toReplace),
-                            currency: this._applyReplacements(payloadObj.currency, toReplace),
-                            value: this._applyReplacements(payloadObj.value, toReplace)
-                        })
+                            return this._buildPayloadForEvent(obj, toReplace)
+                        })) :
+                        this._buildPayloadForEvent(payloadObj, toReplace)
+                    )
                 }))
             }));
 
@@ -194,7 +199,9 @@ define([
         },
         _applyReplacements: function(text, replacers) {
             replacers.forEach(function(replacer) {
-                text = text.split(replacer.from).join(replacer.to);
+                text = text.split(replacer.from).join(replacer.to) // data replace tokens
+                    .split(' ').join('_') // spaces to underscores
+                    .split(/[^\w:]/).join(''); // remove everything that isn't [A-Za-z0-9_]
             })
             return text;
         },

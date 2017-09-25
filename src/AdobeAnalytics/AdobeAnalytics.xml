@@ -76,6 +76,21 @@
                     <category>Payload</category>
                     <description></description>
                 </property>
+                <property key="key_Sector" type="string" required="false" defaultValue="">
+                    <caption>Sector</caption>
+                    <category>Payload</category>
+                    <description></description>
+                </property>
+                <property key="key_Appname" type="string" required="false" defaultValue="">
+                    <caption>Appname</caption>
+                    <category>Payload</category>
+                    <description></description>
+                </property>
+                <property key="key_Language" type="string" required="false" defaultValue="">
+                    <caption>Language</caption>
+                    <category>Payload</category>
+                    <description></description>
+                </property>
                 <!-- <property key="payload" type="object" required="false" isList="true"><caption>Event Payload</caption><category>Payload</category><description></description><properties><property key="keyName" type="string" required="true" defaultValue=""><caption>Key Name</caption><category>General</category><description></description></property><property key="keyValue" type="string" required="true" defaultValue=""><caption>Key Value</caption><category>General</category><description></description></property></properties></property> -->
             </properties>
         </property>
