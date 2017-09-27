@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<widget id="AdobeAnalytics.widget.AdobeAnalytics" needsEntityContext="true" mobile="true" offlineCapable="true"
+<widget id="AdobeAnalytics.widget.AdobeAnalytics" needsEntityContext="true" mobile="true" offlineCapable="true" 
     xmlns="http://www.mendix.com/widget/1.0/">
     <name>AdobeAnalytics</name>
     <description>The description of this widget.</description>
@@ -7,7 +7,7 @@
     <properties>
         <property key="dataset" type="object" required="false" isList="true">
             <caption>Data Set</caption>
-            <category>Data</category>
+            <category>General</category>
             <description>Data points that you will reference in your event payload</description>
             <properties>
                 <property key="dataName" type="string" required="false" defaultValue="">
@@ -35,7 +35,7 @@
         <property key="events" type="object" required="false" isList="true">
             <caption>Events</caption>
             <category>General</category>
-            <description>Define your events</description>
+            <description>Define your events. Reference any values from your dataset between curly braces. i.e. {name}</description>
             <properties>
                 <property key="type" type="enumeration" defaultValue="PageLoad">
                     <caption>Type</caption>

@@ -44,7 +44,7 @@ define([
             //check for the cordova library and the plugin
             // TODO:
             // add the json config file
-            console.log(ADB);
+            console.debug(ADB ? "ADB Loaded" : "ADB Failed to Load. Ruh Roh.");
         },
 
         postCreate: function() {
@@ -78,12 +78,18 @@ define([
                             VisitorID: event.VisitorID,
                             SessionID: event.SessionID,
                             action: event.action,
-                            country: event.country,
-                            currency: event.currency,
                             value: event.value,
-                            appname: event.appname,
-                            language: event.language,
-                            sector: event.sector
+                            sector: event.sector,
+                            app: {
+                                name: event.appname,
+                                version: this.appVersion,
+                                os: ("undefined" !== typeof device && device.platform ? device.platform.toLowerCase() : "unknown")
+                            },
+                            locale: {
+                                country: event.country,
+                                currency: event.currency,
+                                language: event.language
+                            }
                         }
                     if (event.e_type === "PageLoad") {
                         //fire event
@@ -114,10 +120,10 @@ define([
             console.debug(payload);
             ADB.trackState(name, payload,
                 function(success) {
-                    console.log('success')
+                    console.debug('success')
                 },
                 function(fail) {
-                    console.log(fail)
+                    console.error(fail)
                 });
         },
         _preparePayloads: function() {
@@ -183,6 +189,12 @@ define([
                     }
                 }))
             }));
+            promises.push(new Promise(lang.hitch(this, function(resolve) {
+                cordova.getAppVersion().then(function(data) {
+                    this.appVersion = data;
+                }.bind(this));
+                resolve();
+            })));
             return Promise.all(promises).then(lang.hitch(this, function(resolve) {
                 return new Promise(lang.hitch(this, function(resolve) {
                     resolve(
