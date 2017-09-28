@@ -80,16 +80,22 @@ define([
                             action: event.action,
                             value: event.value,
                             sector: event.sector,
-                            app: {
-                                name: event.appname,
-                                version: this.appVersion,
-                                os: ("undefined" !== typeof device && device.platform ? device.platform.toLowerCase() : "unknown")
-                            },
-                            locale: {
-                                country: event.country,
-                                currency: event.currency,
-                                language: event.language
-                            }
+                            "app.name": event.appname,
+                            "app.version": this.appVersion,
+                            "app.os": ("undefined" !== typeof device && device.platform ? device.platform.toLowerCase() : "unknown"),
+                            "locale.country": event.country,
+                            "locale.currency": event.currency,
+                            "locale.language": event.language,
+                            // app: {
+                            //     name: event.appname,
+                            //     version: this.appVersion,
+                            //     os: ("undefined" !== typeof device && device.platform ? device.platform.toLowerCase() : "unknown")
+                            // },
+                            // locale: {
+                            //     country: event.country,
+                            //     currency: event.currency,
+                            //     language: event.language
+                            // }
                         }
                     if (event.e_type === "PageLoad") {
                         //fire event
