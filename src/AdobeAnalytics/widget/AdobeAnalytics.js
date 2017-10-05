@@ -122,7 +122,7 @@ define([
             }))
         },
         _fireEvent: function(name, payload) {
-            console.debug(`Firing event ${name} with payload:`)
+            console.debug("Firing event " + name + " with payload:");
             console.debug(payload);
             ADB.trackState(name, payload,
                 function(success) {
