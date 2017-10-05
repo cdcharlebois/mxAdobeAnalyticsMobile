@@ -98,10 +98,10 @@ define([
                         // dojoEvent.connect(el, action, handler)...
                         var el = document.getElementsByClassName('mx-name-' + event.e_target)[0]
                         if (!el) {
-                            console.error(`no element found with classname .mx-name-${event.e_target}`)
+                            console.error("no element found with classname .mx-name-" + event.e_target)
                             return;
                         }
-                        console.debug(`Attaching event ${name} to element .mx-name-${event.e_target} with payload:`)
+                        console.debug("Attaching event " + name + " to element .mx-name-" + event.e_target + " with payload:")
                         console.debug(payload);
                         el.dataset.name = name;
                         el.dataset.payload = JSON.stringify(payload);
