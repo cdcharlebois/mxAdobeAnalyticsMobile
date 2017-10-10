@@ -173,14 +173,27 @@ define([
                         /**
                          * In here, add another branch of this if/else where if the keypair ("Data Set") in the modeler
                          * is pulling from a data-attribute, to pull that value as the (`to`) and use the (`re`) as the (`from`).
+                         * TODO:
+                         * [ ] needs to have error-handling if the data attribute is not yet set
+                         * [ ] needs to get the name of the element dynamically...
                          */
-                    if (this._contextObj.get(keyPair.dataAttribute) !== null) {
+                    if (keyPair.isDataAttributeOnDom) {
+                        console.debug("Retrieving value from data-attribute");
+                        var el = document.querySelector(".mx-name-actionButton1");
+                        toReplace.push({
+                            from: re,
+                            to: el.dataset[keyPair.dataAttributeKeyName]
+                        });
+                        resolve();
+                    } else if (this._contextObj.get(keyPair.dataAttribute) !== null) {
+                        console.debug("Retrieving value from context object.");
                         toReplace.push({
                             from: re,
                             to: this._contextObj.get(keyPair.dataAttribute)
                         });
                         resolve()
-                    } else {
+                    } else if (keyPair.dataAttribute.indexOf("/") > -1) {
+                        console.debug("Retrieving value over association from context object.");
                         mx.data.get({
                             guid: this._contextObj.get(keyPair.dataAttribute.split('/')[0]),
                             callback: function(res) {

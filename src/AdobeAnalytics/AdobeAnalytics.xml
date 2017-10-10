@@ -10,7 +10,7 @@
             <category>General</category>
             <description>Data points that you will reference in your event payload</description>
             <properties>
-                <!-- <property key="isDataAttributeOnDom" type="boolean" required="true" defaultValue="false">
+                <property key="isDataAttributeOnDom" type="boolean" required="true" defaultValue="false">
                     <caption>Data Attribute?</caption>
                     <category>General</category>
                     <description>Set to (`true`) if the value for this key should come from the DOM. If true, the value of "DS Key" overrides "Value"</description>
@@ -19,7 +19,7 @@
                     <caption>DS Key</caption>
                     <category>General</category>
                     <description>The name of the data attribute. e.g. (`&lt;button data-some-key="value"&gt;`) would be (`someKey`)</description>
-                </property> -->
+                </property>
                 <property key="dataName" type="string" required="false" defaultValue="">
                     <caption>Name</caption>
                     <category>General</category>
