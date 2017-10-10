@@ -72,8 +72,8 @@ define([
         _attachListeners: function(eventList) {
             return new Promise(lang.hitch(this, function(resolve, reject) {
                 eventList.forEach(lang.hitch(this, function(event) {
-                    // TODO: Attach events (or fire)
-                    var name = event.e_name,
+                    // new: add sector and appname
+                    var name = event.sector + ":" + event.appname + ":" + event.e_name,
                         payload = {
                             VisitorID: event.VisitorID,
                             SessionID: event.SessionID,
@@ -164,11 +164,16 @@ define([
             }
         },
         _replaceTokens: function(payloadObj) {
+
             var toReplace = [],
                 ret = [];
             var promises = this.dataset.map(lang.hitch(this, function(keyPair) {
                 return new Promise(lang.hitch(this, function(resolve) {
                     var re = new RegExp('\{' + keyPair.dataName + '\}', 'g')
+                        /**
+                         * In here, add another branch of this if/else where if the keypair ("Data Set") in the modeler
+                         * is pulling from a data-attribute, to pull that value as the (`to`) and use the (`re`) as the (`from`).
+                         */
                     if (this._contextObj.get(keyPair.dataAttribute) !== null) {
                         toReplace.push({
                             from: re,
