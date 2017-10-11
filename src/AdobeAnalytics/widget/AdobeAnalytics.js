@@ -90,30 +90,42 @@ define([
                                 currency: event.currency,
                                 language: event.language
                             }
-                        }
+                        },
+                        el;
                     if (event.e_type === "PageLoad") {
                         //fire event
                         this._fireEvent(name, payload);
-                    } else {
+                    } else if (event.e_type === "GlobalClick") {
                         // dojoEvent.connect(el, action, handler)...
-                        var el = document.getElementsByClassName('mx-name-' + event.e_target)[0]
+                        el = document.getElementsByClassName('mx-name-' + event.e_target)[0]
                         if (!el) {
-                            console.error("no element found with classname .mx-name-" + event.e_target)
-                            return;
+                            console.error("no element found with classname .mx-name-" + event.e_target + ". Please check your widget's event configuration for event: " + event.e_name);
+                            resolve();
                         }
-                        console.debug("Attaching event " + name + " to element .mx-name-" + event.e_target + " with payload:")
-                        console.debug(payload);
-                        el.dataset.name = name;
-                        el.dataset.payload = JSON.stringify(payload);
-                        el.addEventListener('touchstart', lang.hitch(this, function(e) {
-                            this._fireEvent(e.target.dataset.name, JSON.parse(e.target.dataset.payload))
-                        }));
+                        this._attachListenerToElement(el, name, payload);
+                    } else if (event.e_type === "SiblingClick") {
+                        el = this.domNode.parentElement.querySelector('.mx-name-' + event.e_target);
+                        if (!el) {
+                            console.error("no sibling element found with classname .mx-name-" + event.e_target + ". Please check your widget's event configuration for event: " + event.e_name);
+                            resolve();
+                        }
+                        this._attachListenerToElement(el, name, payload);
                     }
 
-                }))
+                }));
                 this._executed = true;
                 resolve();
             }))
+        },
+
+        _attachListenerToElement: function(el, name, payload) {
+            console.debug("Attaching event " + name + " to element with class " + el.className.split(" ").join(".") + " with payload:")
+            console.debug(payload);
+            el.dataset.name = name;
+            el.dataset.payload = JSON.stringify(payload);
+            el.addEventListener('touchstart', lang.hitch(this, function(e) {
+                this._fireEvent(e.target.dataset.name, JSON.parse(e.target.dataset.payload));
+            }));
         },
         _fireEvent: function(name, payload) {
             console.debug("Firing event " + name + " with payload:");

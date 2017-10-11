@@ -53,7 +53,8 @@
                     <description></description>
                     <enumerationValues>
                         <enumerationValue key="PageLoad">Page Load</enumerationValue>
-                        <enumerationValue key="Click">Click</enumerationValue>
+                        <enumerationValue key="GlobalClick">Global Click</enumerationValue>
+                        <enumerationValue key="SiblingClick">Sibling Click</enumerationValue>
                     </enumerationValues>
                 </property>
                 <property key="target" type="string" required="false" defaultValue="">
