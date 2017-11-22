@@ -16,7 +16,6 @@ define([
     "dojo/_base/event",
     "AdobeAnalytics/widget/lib/ADB_Helper"
 
-
 ], function(declare, _WidgetBase, dom, dojoDom, dojoProp, dojoGeometry, dojoClass, dojoStyle, dojoConstruct, dojoArray, lang, dojoText, dojoHtml, dojoEvent, ADB) {
     "use strict";
 
@@ -124,7 +123,15 @@ define([
             el.dataset.name = name;
             el.dataset.payload = JSON.stringify(payload);
             el.addEventListener('touchstart', lang.hitch(this, function(e) {
-                this._fireEvent(e.target.dataset.name, JSON.parse(e.target.dataset.payload));
+                if (e.target.dataset && e.target.dataset.payload) {
+                    this._fireEvent(e.target.dataset.name, JSON.parse(e.target.dataset.payload));
+                } else {
+                    console.error(
+                        "An error occurred while trying to fire the event.\n" +
+                        "Payload: " + e.target.dataset.payload
+                    );
+                }
+
             }));
         },
         _fireEvent: function(name, payload) {
