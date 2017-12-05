@@ -200,16 +200,22 @@ define([
                         });
                         resolve()
                     } else {
-                        mx.data.get({
-                            guid: this._contextObj.get(keyPair.dataAttribute.split('/')[0]),
-                            callback: function(res) {
-                                toReplace.push({
-                                    from: re,
-                                    to: res.get(keyPair.dataAttribute.split('/')[2])
-                                })
-                                resolve()
-                            }
-                        })
+                        var referencedGuid = this._contextObj.get(keyPair.dataAttribute.split('/')[0]);
+                        if (referencedGuid) {
+                            mx.data.get({
+                                guid: referencedGuid,
+                                callback: function(res) {
+                                    toReplace.push({
+                                        from: re,
+                                        to: res.get(keyPair.dataAttribute.split('/')[2])
+                                    })
+                                    resolve()
+                                }
+                            })
+                        } else {
+                            console.debug("No associated object found over association: " + keyPair.dataAttribute.split('/')[0]);
+                            resolve();
+                        }
                     }
                 }))
             }));
@@ -235,11 +241,9 @@ define([
         },
         _applyReplacements: function(text, replacers) {
             replacers.forEach(function(replacer) {
-                text = text.split(replacer.from).join(replacer.to) // data replace tokens
-                    .split(' ').join('_') // spaces to underscores
-                    .split(/[^\w:]/).join(''); // remove everything that isn't [A-Za-z0-9_]
-            })
-            return text;
+                text = text.split(replacer.from).join(replacer.to); // data replace tokens
+            });
+            return text.split(' ').join('_').split(/[^\w:]/).join(''); // spaces to underscores // remove everything that isn't [A-Za-z0-9_]
         },
         _updateRendering: function(callback) {
             logger.debug(this.id + "._updateRendering");
