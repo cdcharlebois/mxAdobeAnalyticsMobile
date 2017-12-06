@@ -123,8 +123,9 @@ define([
             el.dataset.name = name;
             el.dataset.payload = JSON.stringify(payload);
             el.addEventListener('touchstart', lang.hitch(this, function(e) {
-                if (e.target.dataset && e.target.dataset.payload) {
-                    this._fireEvent(e.target.dataset.name, JSON.parse(e.target.dataset.payload));
+                var payloadElement = this._getClosestParentWithPayload(e.target);
+                if (payloadElement) {
+                    this._fireEvent(payloadElement.dataset.name, JSON.parse(payloadElement.dataset.payload));
                 } else {
                     console.error(
                         "An error occurred while trying to fire the event.\n" +
@@ -133,6 +134,16 @@ define([
                 }
 
             }));
+        },
+
+        _getClosestParentWithPayload: function(el) {
+            if (el.dataset && el.dataset.payload) {
+                return el;
+            } else if (el.tagName === "BODY") {
+                return null;
+            } else {
+                return this._getClosestParentWithPayload(el.parentElement);
+            }
         },
         _fireEvent: function(name, payload) {
             console.debug("Firing event " + name + " with payload:");
