@@ -39,7 +39,7 @@ define([
         _executed: false,
 
         constructor: function() {
-            this._handles = [];
+            this._handles = {};
             //check for the cordova library and the plugin
             // TODO:
             // add the json config file
@@ -72,28 +72,30 @@ define([
             return new Promise(lang.hitch(this, function(resolve, reject) {
                 eventList.forEach(lang.hitch(this, function(event) {
                     // new: add sector and appname
-                    var name = event.sector + ":" + event.appname + ":" + event.e_name,
-                        payload = {
-                            VisitorID: event.VisitorID,
-                            SessionID: event.SessionID,
-                            action: event.action,
-                            value: event.value,
-                            sector: event.sector,
-                            app: {
-                                name: event.appname,
-                                version: this.appVersion,
-                                os: ("undefined" !== typeof device && device.platform ? device.platform.toLowerCase() : "unknown")
-                            },
-                            locale: {
-                                country: event.country,
-                                currency: event.currency,
-                                language: event.language
+                    var eventModel = {
+                            name: event.sector + ":" + event.appname + ":" + event.e_name,
+                            payload: {
+                                VisitorID: event.VisitorID,
+                                SessionID: event.SessionID,
+                                action: event.action,
+                                value: event.value,
+                                sector: event.sector,
+                                app: {
+                                    name: event.appname,
+                                    version: this.appVersion,
+                                    os: ("undefined" !== typeof device && device.platform ? device.platform.toLowerCase() : "unknown")
+                                },
+                                locale: {
+                                    country: event.country,
+                                    currency: event.currency,
+                                    language: event.language
+                                }
                             }
                         },
                         el;
                     if (event.e_type === "PageLoad") {
                         //fire event
-                        this._fireEvent(name, payload);
+                        this._fireEvent(eventModel.name, eventModel.payload);
                     } else if (event.e_type === "GlobalClick") {
                         // dojoEvent.connect(el, action, handler)...
                         el = document.getElementsByClassName('mx-name-' + event.e_target)[0]
@@ -101,14 +103,14 @@ define([
                             console.error("no element found with classname .mx-name-" + event.e_target + ". Please check your widget's event configuration for event: " + event.e_name);
                             resolve();
                         }
-                        this._attachListenerToElement(el, name, payload);
+                        this._attachListenerToElement(el, eventModel);
                     } else if (event.e_type === "SiblingClick") {
                         el = this.domNode.parentElement.querySelector('.mx-name-' + event.e_target);
                         if (!el) {
                             console.error("no sibling element found with classname .mx-name-" + event.e_target + ". Please check your widget's event configuration for event: " + event.e_name);
                             resolve();
                         }
-                        this._attachListenerToElement(el, name, payload);
+                        this._attachListenerToElement(el, eventModel);
                     }
 
                 }));
@@ -117,27 +119,41 @@ define([
             }))
         },
 
-        _attachListenerToElement: function(el, name, payload) {
-            console.debug("Attaching event " + name + " to element with class " + el.className.split(" ").join(".") + " with payload:")
-            console.debug(payload);
-            el.dataset.name = name;
-            el.dataset.payload = JSON.stringify(payload);
-            el.addEventListener('touchstart', lang.hitch(this, function(e) {
-                var payloadElement = this._getClosestParentWithPayload(e.target);
-                if (payloadElement) {
-                    this._fireEvent(payloadElement.dataset.name, JSON.parse(payloadElement.dataset.payload));
-                } else {
-                    console.error(
-                        "An error occurred while trying to fire the event.\n" +
-                        "Payload: " + e.target.dataset.payload
-                    );
-                }
+        _attachListenerToElement: function(el, model) {
+            var elementClassName = el.className.split(" ").join(".");
+            console.debug("Attaching event " + model.name + " to element with class " + elementClassName + " with payload:");
+            console.debug(model.payload);
+            var eventsOnElement = el.dataset.mendixOmnitureEvents ? JSON.parse(el.dataset.mendixOmnitureEvents) : [];
+            eventsOnElement.push(model);
+            el.dataset.mendixOmnitureEvents = JSON.stringify(eventsOnElement);
+            // el.dataset.name = name;
+            // el.dataset.payload = JSON.stringify(payload);
+            if (eventsOnElement.length === 1) { // only add the listener on the first event model
+                var handler = this.connect(el, "touchstart", lang.hitch(this, function(e) {
+                    var payloadElement = this._getClosestParentWithPayload(e.target);
+                    if (payloadElement) {
+                        var events = JSON.parse(payloadElement.dataset.mendixOmnitureEvents),
+                            numberOfEvents = events.length;
+                        console.debug("Firing " + numberOfEvents + " events");
+                        events.forEach(lang.hitch(this, function(eventModel) {
+                            this._fireEvent(eventModel.name, eventModel.payload);
+                        }));
+                    } else {
+                        console.error(
+                            "An error occurred while trying to fire the event.\n" +
+                            "Payload: " + e.target.dataset.payload
+                        );
+                    }
+                }));
+                this._handles[elementClassName] = handler;
+            } else {
+                console.debug("Skipping adding listener to "+elementClassName+". Listener already added");
+            }
 
-            }));
         },
 
         _getClosestParentWithPayload: function(el) {
-            if (el.dataset && el.dataset.payload) {
+            if (el.dataset && el.dataset.mendixOmnitureEvents) {
                 return el;
             } else if (el.tagName === "BODY") {
                 return null;
@@ -200,10 +216,10 @@ define([
             var promises = this.dataset.map(lang.hitch(this, function(keyPair) {
                 return new Promise(lang.hitch(this, function(resolve) {
                     var re = new RegExp('\{' + keyPair.dataName + '\}', 'g')
-                        /**
-                         * In here, add another branch of this if/else where if the keypair ("Data Set") in the modeler
-                         * is pulling from a data-attribute, to pull that value as the (`to`) and use the (`re`) as the (`from`).
-                         */
+                    /**
+                     * In here, add another branch of this if/else where if the keypair ("Data Set") in the modeler
+                     * is pulling from a data-attribute, to pull that value as the (`to`) and use the (`re`) as the (`from`).
+                     */
                     if (this._contextObj.get(keyPair.dataAttribute) !== null) {
                         toReplace.push({
                             from: re,
