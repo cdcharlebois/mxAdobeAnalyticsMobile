@@ -10,16 +10,25 @@
             <category>General</category>
             <description>Data points that you will reference in your event payload</description>
             <properties>
-                <!-- <property key="isDataAttributeOnDom" type="boolean" required="true" defaultValue="false"><caption>Data Attribute?</caption><category>General</category><description>Set to (`true`) if the value for this key should come from the DOM. If true, the value of "DS Key" overrides "Value"</description></property><property key="dataAttributeKeyName" type="string" required="false" defaultValue=""><caption>DS Key</caption><category>General</category><description>The name of the data attribute. e.g. (`&lt;button data-some-key="value"&gt;`) would be (`someKey`)</description></property> -->
+                <property key="dataSourceType" type="enumeration" defaultValue="context" required="true">
+                    <caption>Data Source</caption>
+                    <category>_General</category>
+                    <description>Where does this value come from? (If using anything other than `Context`, configure the appropriate tab.)</description>
+                    <enumerationValues>
+                        <enumerationValue key="context">Context (Default)</enumerationValue>
+                        <enumerationValue key="session">Session (Soon)</enumerationValue>
+                        <enumerationValue key="account">Account</enumerationValue>
+                    </enumerationValues>
+                </property>
                 <property key="dataName" type="string" required="false" defaultValue="">
                     <caption>Name</caption>
-                    <category>General</category>
+                    <category>_General</category>
                     <description>{name}</description>
                 </property>
-                <property key="dataAttribute" type="attribute" required="true" isPath="optional" pathType="reference">
+                <property key="dataAttribute" type="attribute" required="false" isPath="optional" pathType="reference">
                     <caption>Value</caption>
-                    <category>General</category>
-                    <description>The value at this attribute will replace (`{name}`) in the payload</description>
+                    <category>Context (Default)</category>
+                    <description>If the Data Source is `Context`, the value at this attribute will replace (`{name}`) in the payload</description>
                     <attributeTypes>
                         <attributeType name="AutoNumber"/>
                         <attributeType name="Boolean"/>
@@ -30,6 +39,36 @@
                         <attributeType name="Long"/>
                         <attributeType name="String"/>
                     </attributeTypes>
+                </property>
+                <property key="dataSessionAttribute" type="string" required="false">
+                    <caption>Value (Session)</caption>
+                    <category>Session</category>
+                    <description>Required if Data Source is "Session"</description>
+                </property>
+                <property key="dataSessionEntity" type="string" required="false">
+                    <caption>Session</caption>
+                    <category>Session</category>
+                    <description>The session entity. Should be `System.Session`</description>
+                </property>
+                <property key="dataAccountEntity" type="string" required="false">
+                  <caption>Account Entity</caption>
+                  <category>Account</category>
+                  <description>Should be `Administration.Account`.</description>
+                </property>
+                <property key="dataAccountAssociation" type="string" required="false">
+                  <caption>Association Name</caption>
+                  <category>Account</category>
+                  <description>The name of the association from the Account Entity to the Target Entity.</description>
+                </property>
+                <property key="dataAccountTargetEntity" type="string" required="false">
+                  <caption>Target Entity</caption>
+                  <category>Account</category>
+                  <description>The name of the Target Entity. i.e. `ContentManagement.Country`</description>
+                </property>
+                <property key="dataAccountTargetAttribute" type="string" required="false">
+                  <caption>Target Attribute</caption>
+                  <category>Account</category>
+                  <description>The name of the Targeet Attribute (should be an attribute of the Entity above).</description>
                 </property>
             </properties>
         </property>

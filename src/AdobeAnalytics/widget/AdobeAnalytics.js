@@ -26,12 +26,6 @@ define([
         // name: null, // string: event name
         dataset: null, // {dataname, dataAttribute}
         events: null, // {all the keys below}
-        // key_VistorId: null,
-        // key_SessionId: null,
-        // key_Action: null,
-        // key_Country: null,
-        // key_Currency: null,
-        // key_Value: null,
 
         // Internal variables.
         _handles: null,
@@ -147,7 +141,7 @@ define([
                 }));
                 this._handles[elementClassName] = handler;
             } else {
-                console.debug("Skipping adding listener to "+elementClassName+". Listener already added");
+                console.debug("Skipping adding listener to " + elementClassName + ". Listener already added");
             }
 
         },
@@ -216,34 +210,121 @@ define([
             var promises = this.dataset.map(lang.hitch(this, function(keyPair) {
                 return new Promise(lang.hitch(this, function(resolve) {
                     var re = new RegExp('\{' + keyPair.dataName + '\}', 'g')
-                    /**
-                     * In here, add another branch of this if/else where if the keypair ("Data Set") in the modeler
-                     * is pulling from a data-attribute, to pull that value as the (`to`) and use the (`re`) as the (`from`).
-                     */
-                    if (this._contextObj.get(keyPair.dataAttribute) !== null) {
-                        toReplace.push({
-                            from: re,
-                            to: this._contextObj.get(keyPair.dataAttribute)
-                        });
-                        resolve()
-                    } else {
-                        var referencedGuid = this._contextObj.get(keyPair.dataAttribute.split('/')[0]);
-                        if (referencedGuid) {
-                            mx.data.get({
-                                guid: referencedGuid,
-                                callback: function(res) {
-                                    toReplace.push({
-                                        from: re,
-                                        to: res.get(keyPair.dataAttribute.split('/')[2])
-                                    })
-                                    resolve()
-                                }
-                            })
+                    if (keyPair.dataSourceType === "context") {
+                        if (this._contextObj.get(keyPair.dataAttribute) !== null) {
+                            toReplace.push({
+                                from: re,
+                                to: this._contextObj.get(keyPair.dataAttribute)
+                            });
+                            resolve()
                         } else {
-                            console.debug("No associated object found over association: " + keyPair.dataAttribute.split('/')[0]);
+                            var referencedGuid = this._contextObj.get(keyPair.dataAttribute.split('/')[0]);
+                            if (referencedGuid) {
+                                mx.data.get({
+                                    guid: referencedGuid,
+                                    callback: function(res) {
+                                        toReplace.push({
+                                            from: re,
+                                            to: res.get(keyPair.dataAttribute.split('/')[2])
+                                        })
+                                        resolve();
+                                    }
+                                })
+                            } else {
+                                console.error("No associated object found over association: " + keyPair.dataAttribute.split('/')[0]);
+                                resolve();
+                            }
+                        }
+                    } else if (keyPair.dataSourceType === "session") {
+                        // Check that the value for session entity and the attribute are set correctly.
+                        // get the attribute
+                        if (keyPair.dataSessionEntity && keyPair.dataSessionAttribute) {
+                            var splitSessionAttributePath = keyPair.dataSessionAttribute.split("/"),
+                                justAttributeName = splitSessionAttributePath[splitSessionAttributePath.length - 1],
+                                targetObjectName = splitSessionAttributePath[splitSessionAttributePath.length - 2],
+                                targetAssociationName = splitSessionAttributePath[splitSessionAttributePath.length - 3];
+
+                            mx.data.getOffline(targetObjectName, [{
+                                    attribute: targetAssociationName,
+                                    operator: "equals",
+                                    value: mx.session.sessionData.sessionObjectId // the guid of the session
+                                }], {
+                                    limit: 1
+                                }, function(foundObject) {
+                                    if (foundObject) {
+                                        toReplace.push({
+                                            from: re,
+                                            to: foundObject[0].get(justAttributeName)
+                                        });
+                                    } else {
+                                        console.error("No associated object over association: " + keyPair.dataSessionAttribute);
+                                    }
+                                    resolve();
+                                },
+                                function(e) {
+                                    console.error("No associated object over association: " + keyPair.dataSessionAttribute);
+                                    resolve();
+                                });
+
+                        } else {
+                            console.error("No Session entity defined.");
                             resolve();
                         }
+                    } else if (keyPair.dataSourceType === "account") {
+                        // get the account entity
+                        // query to the target
+                        var sourceEntity = keyPair.dataAccountEntity || "CRM.Consumer",
+                            association = keyPair.dataAccountAssociation || "CRM.Person_Country",
+                            targetEntity = keyPair.dataAccountTargetEntity || "ContentManagement.Country", //doesn't matter
+                            targetAttribute = keyPair.dataAccountTargetAttribute || "Name";
+                        if (sourceEntity === targetEntity) {
+                            this._getValueOfPropertyOnEntity(targetAttribute, sourceEntity)
+                                .then(lang.hitch(this, function(value) {
+                                    toReplace.push({
+                                        from: re,
+                                        to: value
+                                    });
+                                    resolve();
+                                }));
+                        } else {
+                            this._getValueOfPropertyOnEntity(association, sourceEntity)
+                                .then(lang.hitch(this, function(value) { // this should be turned into a promise that resolves with the value to replace 
+                                    if (value) {
+                                        mx.data.get({
+                                            guid: value,
+                                            callback: function(obj) {
+                                                if (obj.get(targetAttribute) === null) {
+                                                    console.log("The value of attribute " + targetAttribute + " is null for " + targetEntity + " with guid " + value);
+                                                }
+                                                toReplace.push({
+                                                    from: re,
+                                                    to: obj.get(targetAttribute)
+                                                });
+                                                resolve();
+                                            }
+                                        });
+                                    } else {
+                                        console.log("The value of property " + association + " is null for the found " + sourceEntity + " entity");
+                                        toReplace.push({
+                                            from: re,
+                                            to: null
+                                        });
+                                        resolve();
+                                    }
+
+                                }))
+                                .catch(function(err) {
+                                    console.error(err);
+                                    toReplace.push({
+                                        from: re,
+                                        to: null
+                                    });
+                                    resolve();
+                                });
+                        }
+
                     }
+
                 }))
             }));
             promises.push(new Promise(lang.hitch(this, function(resolve) {
@@ -265,6 +346,21 @@ define([
             }));
 
             // return text;
+        },
+        _getValueOfPropertyOnEntity: function(propertyName, entity) {
+            return new Promise(lang.hitch(this, function(resolve, reject) {
+                mx.data.getOffline(entity, null, {}, function(mxobjs, count) {
+                    console.debug("Found " + count + " " + entity + " objects.");
+                    if (count === 1) {
+                        resolve(mxobjs[0].get(propertyName));
+                    } else {
+                        reject("Found " + count + " " + entity + " objects. Please change access rules so that only one is accessible by this user.");
+                    }
+                }, function(e) {
+                    console.error(e);
+                    reject(e);
+                });
+            }));
         },
         _applyReplacements: function(text, replacers) {
             replacers.forEach(function(replacer) {
