@@ -236,40 +236,8 @@ define([
                             }
                         }
                     } else if (keyPair.dataSourceType === "session") {
-                        // Check that the value for session entity and the attribute are set correctly.
-                        // get the attribute
-                        if (keyPair.dataSessionEntity && keyPair.dataSessionAttribute) {
-                            var splitSessionAttributePath = keyPair.dataSessionAttribute.split("/"),
-                                justAttributeName = splitSessionAttributePath[splitSessionAttributePath.length - 1],
-                                targetObjectName = splitSessionAttributePath[splitSessionAttributePath.length - 2],
-                                targetAssociationName = splitSessionAttributePath[splitSessionAttributePath.length - 3];
-
-                            mx.data.getOffline(targetObjectName, [{
-                                    attribute: targetAssociationName,
-                                    operator: "equals",
-                                    value: mx.session.sessionData.sessionObjectId // the guid of the session
-                                }], {
-                                    limit: 1
-                                }, function(foundObject) {
-                                    if (foundObject) {
-                                        toReplace.push({
-                                            from: re,
-                                            to: foundObject[0].get(justAttributeName)
-                                        });
-                                    } else {
-                                        console.error("No associated object over association: " + keyPair.dataSessionAttribute);
-                                    }
-                                    resolve();
-                                },
-                                function(e) {
-                                    console.error("No associated object over association: " + keyPair.dataSessionAttribute);
-                                    resolve();
-                                });
-
-                        } else {
-                            console.error("No Session entity defined.");
-                            resolve();
-                        }
+                        console.error("Session datatypes are not yet supported");
+                        resolve();
                     } else if (keyPair.dataSourceType === "account") {
                         // get the account entity
                         // query to the target

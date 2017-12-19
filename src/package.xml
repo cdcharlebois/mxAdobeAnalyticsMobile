@@ -3,6 +3,7 @@
     <clientModule name="AdobeAnalytics" version="1.1.0" xmlns="http://www.mendix.com/clientModule/1.0/">
         <widgetFiles>
             <widgetFile path="AdobeAnalytics/AdobeAnalytics.xml"/>
+            <widgetFile path="AdobeAnalytics/AdobeAnalyticsNoContext.xml"/>
         </widgetFiles>
         <files>
             <file path="AdobeAnalytics/widget/"/>
