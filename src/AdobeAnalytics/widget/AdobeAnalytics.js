@@ -95,14 +95,14 @@ define([
                         el = document.getElementsByClassName('mx-name-' + event.e_target)[0]
                         if (!el) {
                             console.error("no element found with classname .mx-name-" + event.e_target + ". Please check your widget's event configuration for event: " + event.e_name);
-                            resolve();
+                            return;
                         }
                         this._attachListenerToElement(el, eventModel);
                     } else if (event.e_type === "SiblingClick") {
                         el = this.domNode.parentElement.querySelector('.mx-name-' + event.e_target);
                         if (!el) {
                             console.error("no sibling element found with classname .mx-name-" + event.e_target + ". Please check your widget's event configuration for event: " + event.e_name);
-                            resolve();
+                            return;
                         }
                         this._attachListenerToElement(el, eventModel);
                     }
@@ -123,7 +123,7 @@ define([
             // el.dataset.name = name;
             // el.dataset.payload = JSON.stringify(payload);
             if (eventsOnElement.length === 1) { // only add the listener on the first event model
-                var handler = this.connect(el, "touchstart", lang.hitch(this, function(e) {
+                var handler = this.connect(el, "click", lang.hitch(this, function(e) {
                     var payloadElement = this._getClosestParentWithPayload(e.target);
                     if (payloadElement) {
                         var events = JSON.parse(payloadElement.dataset.mendixOmnitureEvents),
